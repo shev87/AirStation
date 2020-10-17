@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 
 import static com.example.airstation.MainActivity.TAG;
@@ -16,7 +18,8 @@ public class ControllerBluetooth extends Activity {
     private BluetoothAdapter bluetoothAdapter;
     private Set<BluetoothDevice> pairedDevices;
     public BluetoothSocket bluetoothSocket;
-
+    private OutputStream outputStream;
+    public MyBluetoothService myBluetoothService;
     public void init() {
         if (bluetoothAdapter != null) {
             if (bluetoothAdapter.isEnabled()) {
@@ -37,8 +40,9 @@ public class ControllerBluetooth extends Activity {
                         Log.i(TAG, "try to connect");
                         bluetoothSocket.connect();
                         Log.i(TAG,"Connection is OK!!!");
-
-                        MyBluetoothService myBluetoothService = new MyBluetoothService(bluetoothSocket);
+                        outputStream = bluetoothSocket.getOutputStream();
+                        outputStream.write(1);
+                        myBluetoothService = new MyBluetoothService(bluetoothSocket);
 
                     } catch (Exception e) {
                         Log.i(TAG,"\r\n" + e.getMessage() + e.getCause());
@@ -50,6 +54,13 @@ public class ControllerBluetooth extends Activity {
                 Log.i(TAG, "Bluetooth is disabled.");
             }
         }
+    }
+
+    public void write(String s) throws IOException {
+        synchronized (this) {
+            outputStream.write(s.getBytes());
+        }
+
     }
 
     public ControllerBluetooth() {

@@ -24,7 +24,7 @@ public class MyBluetoothService extends Activity {
         // ... (Add other message types here as needed.)
     }
 
-    public MyBluetoothService(BluetoothSocket mmSocket)  {
+    public MyBluetoothService(BluetoothSocket mmSocket) {
         ConnectedThread connectedThread = new ConnectedThread(mmSocket);
         connectedThread.start();
     }
@@ -58,7 +58,6 @@ public class MyBluetoothService extends Activity {
         }
 
 
-
         public void run() {
             mmBuffer = new byte[1024];
             int numBytes; // bytes returned from read()
@@ -73,18 +72,20 @@ public class MyBluetoothService extends Activity {
                             e.printStackTrace();
                         }
                         // Read from the InputStream.
-                        while (mmInStream.available()>0) {
+                        while (mmInStream.available() > 0) {
                             numBytes = mmInStream.read(mmBuffer);
                             s = new String(mmBuffer);
                             s = s.substring(0, numBytes);
                         }
                         Log.i(TAG, "Received message: " + s);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Handler.showData(s);
-                            }
-                        });
+                        if (s != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Handler.showData(s);
+                                }
+                            });
+                        }
                         // Send the obtained bytes to the UI activity.
                     /*Message readMsg = handler.obtainMessage(
                             MessageConstants.MESSAGE_READ, numBytes, -1,
